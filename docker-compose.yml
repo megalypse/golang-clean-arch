@@ -13,7 +13,7 @@ services:
     volumes:
       - cleanarchdb:/data/cleanarch-db
     ports:
-      - "5431:5432"
+      - "${DB_PORT}:5432"
     restart: unless-stopped
 
 volumes:
