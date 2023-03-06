@@ -1,0 +1,21 @@
+services:
+  postgres-db:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    image: "cleanarch-db"
+    container_name: ${PG_CONTAINER_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    volumes:
+      - cleanarchdb:/data/cleanarch-db
+    ports:
+      - "5431:5432"
+    restart: unless-stopped
+
+volumes:
+  cleanarchdb:
+    external: true
