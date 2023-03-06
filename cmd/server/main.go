@@ -3,11 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/megalypse/golang-clean-arch/internal/main/factory"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	router := factory.GetRouter()
+	port := ":3000"
 
-	err := http.ListenAndServe(":3000", mux)
-	log.Fatal(err)
+	factory.BootControllers()
+
+	log.Printf("Listening on port %s", port)
+	err := http.ListenAndServe(port, router)
+	log.Println(err.Error())
 }

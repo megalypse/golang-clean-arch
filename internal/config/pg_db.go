@@ -3,14 +3,16 @@ package config
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 const (
 	host     = "localhost"
 	port     = "5431"
-	user     = "clean-archer"
+	user     = "clean_archer"
 	password = "arrow"
-	dbname   = "cleanarch-db"
+	dbname   = "clean_arch"
 )
 
 var psqlInfo = fmt.Sprintf("host=%s port=%s user=%s "+
@@ -29,6 +31,5 @@ func GetPgDbConnection() *sql.DB {
 	}
 
 	fmt.Println("Pg database connection created")
-
 	return db
 }

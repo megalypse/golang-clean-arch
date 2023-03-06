@@ -6,13 +6,13 @@ import (
 )
 
 type PersonService struct {
-	personRepository repository.PersonRepository
+	PersonRepository repository.PersonRepository
 }
 
-func (ps PersonService) GetPersonById(id int) models.Person {
-	return ps.personRepository.GetPersonById(id)
+func (ps PersonService) Get(id int) *models.Person {
+	return ps.PersonRepository.GetPersonById(id)
 }
 
-func (ps PersonService) CreatePerson(person models.Person) models.Person {
-	return ps.personRepository.CreatePerson(person)
+func (ps PersonService) CreatePerson(person models.Person) *models.Person {
+	return ps.PersonRepository.CreatePerson(person)
 }
