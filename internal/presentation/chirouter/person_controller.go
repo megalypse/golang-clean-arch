@@ -53,7 +53,7 @@ func (pc PersonController) BootController() {
 				return
 			}
 
-			person := pc.getPersonByIdUsecase.Get(personId)
+			person := pc.getPersonByIdUsecase.GetPersonById(personId)
 			writeJsonResponse(w, person)
 		})
 	})

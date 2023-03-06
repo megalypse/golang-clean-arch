@@ -3,7 +3,7 @@ package usecases
 import "github.com/megalypse/golang-clean-arch/internal/domain/models"
 
 type GetPersonById interface {
-	Get(int) *models.Person
+	GetPersonById(int) *models.Person
 }
 
 type CreatePerson interface {

@@ -12,7 +12,7 @@ import (
 
 type PgPersonRepository struct{}
 
-func (rep PgPersonRepository) CreatePerson(person models.Person) *models.Person {
+func (rep PgPersonRepository) CreatePerson(person models.Person) int {
 	db := config.GetPgDbConnection()
 	defer db.Close()
 
@@ -34,7 +34,7 @@ func (rep PgPersonRepository) CreatePerson(person models.Person) *models.Person 
 		panic(err)
 	}
 
-	return rep.GetPersonById(newRowId)
+	return newRowId
 }
 
 func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
