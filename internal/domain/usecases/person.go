@@ -13,3 +13,7 @@ type GetAllPeople interface {
 type GetByFilter interface {
 	GetByFilter(models.Person) []models.Person
 }
+
+type CreatePerson interface {
+	CreatePerson(models.Person) models.Person
+}
