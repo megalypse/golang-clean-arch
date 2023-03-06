@@ -24,7 +24,5 @@ func makePersonController() *chirouter.PersonController {
 }
 
 func BootControllers() {
-	personController := makePersonController()
-
-	personController.BootController()
+	makePersonController().BootController()
 }
