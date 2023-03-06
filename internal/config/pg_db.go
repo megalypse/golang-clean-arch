@@ -3,24 +3,16 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = "5431"
-	user     = "clean_archer"
-	password = "arrow"
-	dbname   = "clean_arch"
-)
-
-var psqlInfo = fmt.Sprintf("host=%s port=%s user=%s "+
-	"password=%s dbname=%s sslmode=disable",
-	host, port, user, password, dbname)
-
 func GetPgDbConnection() *sql.DB {
-	db, err := sql.Open("postgres", psqlInfo)
+
+	db, err := sql.Open("postgres", getConnectionString())
 	if err != nil {
 		panic(err)
 	}
@@ -32,4 +24,19 @@ func GetPgDbConnection() *sql.DB {
 
 	fmt.Println("Pg database connection created")
 	return db
+}
+
+func getConnectionString() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"),
+	)
 }
