@@ -1,13 +1,34 @@
 package factory
 
-import "github.com/go-chi/chi"
+import (
+	"log"
 
-var router *chi.Mux
+	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
+)
 
-func init() {
-	router = chi.NewRouter()
-}
+func BootControllers() {
+	router := GetRouter()
 
-func GetRouter() *chi.Mux {
-	return router
+	controllers := GetControllers()
+
+	for _, controller := range controllers {
+		for route, routeData := range controller.GetHandlers() {
+			handlingFunc := routeData.HandlingFunc
+
+			switch routeData.Method {
+			case phttp.GET:
+				router.Get(route, handlingFunc)
+			case phttp.POST:
+				router.Post(route, handlingFunc)
+			case phttp.PUT:
+				router.Put(route, handlingFunc)
+			case phttp.PATCH:
+				router.Patch(route, handlingFunc)
+			case phttp.DELETE:
+				router.Delete(route, handlingFunc)
+			default:
+				log.Fatalf("Http method not supported: %q", routeData.Method)
+			}
+		}
+	}
 }

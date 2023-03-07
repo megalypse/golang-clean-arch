@@ -9,7 +9,6 @@ import (
 )
 
 func GetPgDbConnection() *sql.DB {
-
 	db, err := sql.Open("postgres", getConnectionString())
 	if err != nil {
 		panic(err)
