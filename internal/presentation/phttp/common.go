@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 const (
@@ -17,6 +19,12 @@ const (
 func WriteJsonResponse(w http.ResponseWriter, payload any) {
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(payload)
+}
+
+func GetUrlParam(r *http.Request, key string) string {
+	value := chi.URLParam(r, key)
+
+	return value
 }
 
 func ParseBody[T any](body io.ReadCloser) (*T, error) {

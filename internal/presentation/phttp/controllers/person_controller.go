@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi"
 	"github.com/megalypse/golang-clean-arch/internal/data/service"
 	"github.com/megalypse/golang-clean-arch/internal/domain/models"
 	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
@@ -41,7 +40,7 @@ func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
 		"/person/{personId}": {
 			Method: phttp.GET,
 			HandlingFunc: func(w http.ResponseWriter, r *http.Request) {
-				personId, err := strconv.Atoi(chi.URLParam(r, "personId"))
+				personId, err := strconv.Atoi(phttp.GetUrlParam(r, "personId"))
 
 				if err != nil {
 					http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
