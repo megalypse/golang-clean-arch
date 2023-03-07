@@ -2,6 +2,7 @@ package phttp
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -16,6 +17,17 @@ const (
 func WriteJsonResponse(w http.ResponseWriter, payload any) {
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(payload)
+}
+
+func ParseBody[T any](body io.ReadCloser) (*T, error) {
+	holder := new(T)
+
+	err := json.NewDecoder(body).Decode(holder)
+	if err != nil {
+		return nil, err
+	}
+
+	return holder, nil
 }
 
 type RouteDefinition struct {

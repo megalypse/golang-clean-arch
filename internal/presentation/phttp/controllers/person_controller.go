@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,14 +28,13 @@ func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
 			HandlingFunc: func(w http.ResponseWriter, r *http.Request) {
 				log.Println("Creating new person...")
 
-				person := models.Person{}
-				err := json.NewDecoder(r.Body).Decode(&person)
+				person, err := phttp.ParseBody[models.Person](r.Body)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
 				}
 
-				createdPerson := pc.personService.CreatePerson(person)
+				createdPerson := pc.personService.CreatePerson(*person)
 				phttp.WriteJsonResponse(w, createdPerson)
 			},
 		},
