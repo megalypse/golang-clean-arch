@@ -10,6 +10,7 @@ import (
 	"github.com/megalypse/golang-clean-arch/internal/domain/models"
 )
 
+// TODO: better connection management per request
 type PgPersonRepository struct{}
 
 func (rep PgPersonRepository) CreatePerson(person models.Person) int {
