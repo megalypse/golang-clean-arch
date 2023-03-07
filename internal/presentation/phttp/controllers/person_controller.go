@@ -39,7 +39,7 @@ func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
 			},
 		},
 		"/person/{personId}": {
-			Method: phttp.POST,
+			Method: phttp.GET,
 			HandlingFunc: func(w http.ResponseWriter, r *http.Request) {
 				personId, err := strconv.Atoi(chi.URLParam(r, "personId"))
 
