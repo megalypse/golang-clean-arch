@@ -1,6 +1,6 @@
 # GoLang Clean Architecture
 
-This is a project to sample Clean Architecture and Clean Clode implemented in GoLang.
+This is a project to sample Clean Architecture and Clean Code implemented in GoLang.
 Check `development` branch.
 
 Follow the bellow steps to run the software:
