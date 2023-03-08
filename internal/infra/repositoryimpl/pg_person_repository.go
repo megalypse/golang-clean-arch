@@ -47,8 +47,12 @@ func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
 	WHERE p.id = $1
 	`
 
-	person := models.Person{}
 	row := db.QueryRow(sttmt, id)
+	return getPersonFromRow(row)
+}
+
+func getPersonFromRow(row *sql.Row) *models.Person {
+	person := models.Person{}
 
 	var updatedAt pq.NullTime
 	var deletedAt pq.NullTime
