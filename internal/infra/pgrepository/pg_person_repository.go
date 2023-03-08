@@ -56,7 +56,6 @@ func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
 	return &person[0]
 }
 
-// TODO: Add pagination
 func (rep PgPersonRepository) Filter(filters models.Person, baseFilter models.BaseFilter) models.Paginated[models.Person] {
 	db := config.GetPgDbConnection()
 	defer db.Close()
@@ -156,25 +155,11 @@ func (rep PgPersonRepository) Filter(filters models.Person, baseFilter models.Ba
 	return paginated
 }
 
-/*
-scanner have as purpose to enable `func getPersonFromRow` to receive as argument
-both *sql.Row and *sql.Rows types.
-*/
-type scanner interface {
-	Scan(dest ...any) error
-	Columns() ([]string, error)
-}
-
 func setArg(sttmt string, arg int) string {
 	return sttmt + fmt.Sprint(arg)
 }
 
 func getPeopleFromRows(row *sql.Rows) ([]models.Person, []map[string]any) {
-	// person := models.Person{}
-
-	// var updatedAt pq.NullTime
-	// var deletedAt pq.NullTime
-
 	cols, _ := row.Columns()
 	results := make([]models.Person, 0)
 	rawMaps := make([]map[string]any, 0)
