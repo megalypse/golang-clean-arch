@@ -106,50 +106,22 @@ func (rep PgPersonRepository) Filter(filters models.Person) []models.Person {
 
 	result := []models.Person{}
 	for rows.Next() {
-		person := getPersonFromRows(rows)
+		person := getPersonFromRow(rows)
 		result = append(result, *person)
 	}
 
 	return result
 }
 
-func getPersonFromRows(row *sql.Rows) *models.Person {
-	person := models.Person{}
-
-	var updatedAt pq.NullTime
-	var deletedAt pq.NullTime
-
-	switch err := row.Scan(
-		&person.Id,
-		&person.Fullname,
-		&person.Age,
-		&person.Email,
-		&person.CreatedAt,
-		&updatedAt,
-		&deletedAt,
-	); err {
-	case sql.ErrNoRows:
-		return &models.Person{}
-	case nil:
-		person.UpdatedAt = nil
-		person.DeletedAt = nil
-
-		if updatedAt.Valid {
-			person.UpdatedAt = &updatedAt.Time
-		}
-
-		if deletedAt.Valid {
-			person.DeletedAt = &deletedAt.Time
-		}
-
-		return &person
-	default:
-		log.Println(err.Error())
-		return nil
-	}
+/*
+scanner have as purpose to enable `func getPersonFromRow` to receive as argument
+both *sql.Row and *sql.Rows type.
+*/
+type scanner interface {
+	Scan(dest ...any) error
 }
 
-func getPersonFromRow(row *sql.Row) *models.Person {
+func getPersonFromRow(row scanner) *models.Person {
 	person := models.Person{}
 
 	var updatedAt pq.NullTime
