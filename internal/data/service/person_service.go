@@ -25,6 +25,6 @@ func (ps PersonService) CreatePerson(person models.Person) *models.Person {
 	return ps.GetPersonById(personId)
 }
 
-func (ps PersonService) Filter(filters models.Person) []models.Person {
-	return ps.personRepository.Filter(filters)
+func (ps PersonService) Filter(filters models.Person, baseFilter models.BaseFilter) models.Paginated[models.Person] {
+	return ps.personRepository.Filter(filters, baseFilter)
 }

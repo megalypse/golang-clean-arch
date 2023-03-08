@@ -4,18 +4,22 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/megalypse/golang-clean-arch/internal/data/service"
 	"github.com/megalypse/golang-clean-arch/internal/domain/models"
+	"github.com/megalypse/golang-clean-arch/internal/domain/usecases"
 	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
 )
 
 type personController struct {
-	personService service.PersonService
+	createPersonUseCase  usecases.CreatePerson
+	getPersonByIdUseCase usecases.GetPersonById
+	filterPeopleUsecase  usecases.FilterPeople
 }
 
-func NewPersonController(personService service.PersonService) personController {
+func NewPersonController(personService usecases.PersonService) personController {
 	return personController{
-		personService: personService,
+		createPersonUseCase:  personService,
+		getPersonByIdUseCase: personService,
+		filterPeopleUsecase:  personService,
 	}
 }
 
@@ -43,18 +47,22 @@ func (pc personController) createPerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	createdPerson := pc.personService.CreatePerson(*person)
+	createdPerson := pc.createPersonUseCase.CreatePerson(*person)
 	phttp.WriteJsonResponse(w, createdPerson)
 }
 
 func (pc personController) filter(w http.ResponseWriter, r *http.Request) {
-	person, err := phttp.ParseBody[models.Person](r.Body)
+	person, err := phttp.ParseBody[struct {
+		models.Person
+		models.BaseFilter
+	}](r.Body)
+
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
 		return
 	}
 
-	result := pc.personService.Filter(*person)
+	result := pc.filterPeopleUsecase.Filter(person.Person, person.BaseFilter)
 	phttp.WriteJsonResponse(w, result)
 }
 
@@ -66,6 +74,6 @@ func (pc personController) getPersonById(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	person := pc.personService.GetPersonById(personId)
+	person := pc.getPersonByIdUseCase.GetPersonById(personId)
 	phttp.WriteJsonResponse(w, person)
 }
