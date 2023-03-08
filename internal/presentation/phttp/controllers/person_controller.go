@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -30,12 +29,14 @@ func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
 			Method:       phttp.GET,
 			HandlingFunc: pc.getPersonById,
 		},
+		"/person/filter": {
+			Method:       phttp.POST,
+			HandlingFunc: pc.filter,
+		},
 	}
 }
 
 func (pc personController) createPerson(w http.ResponseWriter, r *http.Request) {
-	log.Println("Creating new person...")
-
 	person, err := phttp.ParseBody[models.Person](r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -44,6 +45,17 @@ func (pc personController) createPerson(w http.ResponseWriter, r *http.Request) 
 
 	createdPerson := pc.personService.CreatePerson(*person)
 	phttp.WriteJsonResponse(w, createdPerson)
+}
+
+func (pc personController) filter(w http.ResponseWriter, r *http.Request) {
+	person, err := phttp.ParseBody[models.Person](r.Body)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+		return
+	}
+
+	result := pc.personService.Filter(*person)
+	phttp.WriteJsonResponse(w, result)
 }
 
 func (pc personController) getPersonById(w http.ResponseWriter, r *http.Request) {
