@@ -1,20 +1,33 @@
 services:
-  postgres-db:
+  postgres_db:
     build:
       context: .
       dockerfile: postgres.dockerfile
-    image: "cleanarch-db"
-    container_name: ${PG_CONTAINER_NAME}
+    image: cleanarch-db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: '/data/postgres-clean-arch'
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - cleanarchdb:/data/cleanarch-db
     ports:
-      - "${DB_PORT}:5432"
-    restart: unless-stopped
+      - "${PG_DB_HOST_PORT}:${PG_DB_CONTAINER_PORT}"
+  server:
+    build:
+      context: .
+      dockerfile: server.dockerfile
+    image: cleanarch-server
+    depends_on:
+      - postgres_db
+    environment:
+      PG_DB_HOST: postgres_db
+      DB_PORT: ${PG_DB_CONTAINER_PORT}
+      PG_DB: ${PG_DB}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      SERVER_CONTAINER_PORT: ${SERVER_CONTAINER_PORT}
+    ports:
+      - "${SERVER_HOST_PORT}:${SERVER_CONTAINER_PORT}"
 
 volumes:
   cleanarchdb:
