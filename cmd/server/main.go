@@ -20,6 +20,11 @@ func main() {
 
 	factory.BootControllers()
 
+	// server := http.Server{
+	// 	Addr:    port,
+	// 	Handler: router,
+	// }
+	// log.Fatal(server.ListenAndServeTLS("certfile.crt", "server.key"))
 	log.Printf("Listening on port %s", port)
 	err = http.ListenAndServe(port, router)
 	log.Println(err.Error())
