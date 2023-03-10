@@ -142,17 +142,24 @@ func (rep PgPersonRepository) Filter(filters models.Person, baseFilter models.Ba
 	}
 
 	people, rawRows := getPeopleFromRows(rows)
-	count := rawRows[0]["count"].(int64)
-	parsedLimit := int64(limit)
-	paginated := models.Paginated[models.Person]{
-		Content:    people,
-		Total:      count,
-		Page:       int64(offset),
-		Limit:      parsedLimit,
-		TotalPages: int64(math.Ceil(float64(count) / float64(parsedLimit))),
+
+	if len(rawRows) > 0 {
+		count := rawRows[0]["count"].(int64)
+		parsedLimit := int64(limit)
+		paginated := models.Paginated[models.Person]{
+			Content:    people,
+			Total:      count,
+			Page:       int64(offset),
+			Limit:      parsedLimit,
+			TotalPages: int64(math.Ceil(float64(count) / float64(parsedLimit))),
+		}
+
+		return paginated
 	}
 
-	return paginated
+	return models.Paginated[models.Person]{
+		Content: []models.Person{},
+	}
 }
 
 func setArg(sttmt string, arg int) string {
