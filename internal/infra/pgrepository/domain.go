@@ -13,18 +13,21 @@ type RowMapper interface {
 type PgPerson models.Person
 
 func (pp *PgPerson) Map(rows map[string]any) {
-	pp.Id = rows["id"].(int64)
-	pp.Fullname = rows["fullname"].(string)
-	pp.Age = rows["age"].(int64)
-	pp.Email = rows["email"].(string)
+	id := rows["id"].(int64)
+	fullname := rows["fullname"].(string)
+	age := rows["age"].(int64)
+	email := rows["email"].(string)
+	createdAt := rows["created_at"].(time.Time)
 
-	createdAt, _ := rows["created_at"].(time.Time)
+	pp.Id = &id
+	pp.Fullname = &fullname
+	pp.Age = &age
+	pp.Email = &email
 	pp.CreatedAt = &createdAt
 
 	updatedAt, ok := rows["updated_at"].(time.Time)
 	if ok {
 		pp.UpdatedAt = &updatedAt
-
 	}
 
 	deletedAt, ok := rows["deleted_at"].(time.Time)

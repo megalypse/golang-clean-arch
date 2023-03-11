@@ -3,7 +3,7 @@ package usecases
 import "github.com/megalypse/golang-clean-arch/internal/domain/models"
 
 type GetPersonById interface {
-	GetPersonById(int) *models.Person
+	GetPersonById(int64) *models.Person
 }
 
 type CreatePerson interface {
@@ -11,7 +11,11 @@ type CreatePerson interface {
 }
 
 type FilterPeople interface {
-	Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person]
+	Filter(*models.BaseFilter[models.Person]) models.Paginated[models.Person]
+}
+
+type UpdatePerson interface {
+	Update(*models.Person) *models.Person
 }
 
 type PersonService interface {
@@ -19,4 +23,5 @@ type PersonService interface {
 	CreatePerson
 	FilterPeople
 	FilterPeople
+	UpdatePerson
 }

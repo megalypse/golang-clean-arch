@@ -8,14 +8,6 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const (
-	GET    = "GET"
-	POST   = "POST"
-	PUT    = "PUT"
-	PATCH  = "PATCH"
-	DELETE = "DELETE"
-)
-
 func WriteJsonResponse(w http.ResponseWriter, payload any) {
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(payload)
@@ -40,5 +32,6 @@ func ParseBody[T any](body io.ReadCloser) (*T, error) {
 
 type RouteDefinition struct {
 	Method       string
+	Route        string
 	HandlingFunc http.HandlerFunc
 }

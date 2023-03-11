@@ -3,10 +3,10 @@ package factory
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	_ "github.com/megalypse/golang-clean-arch/docs"
-	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -16,22 +16,23 @@ func BootControllers() {
 	controllers := GetControllers()
 
 	for _, controller := range controllers {
-		for route, routeData := range controller.GetHandlers() {
-			handlingFunc := routeData.HandlingFunc
+		for _, routeDefinition := range controller.GetHandlers() {
+			handlingFunc := routeDefinition.HandlingFunc
+			route := routeDefinition.Route
 
-			switch routeData.Method {
-			case phttp.GET:
+			switch routeDefinition.Method {
+			case http.MethodGet:
 				router.Get(route, handlingFunc)
-			case phttp.POST:
+			case http.MethodPost:
 				router.Post(route, handlingFunc)
-			case phttp.PUT:
+			case http.MethodPut:
 				router.Put(route, handlingFunc)
-			case phttp.PATCH:
+			case http.MethodPatch:
 				router.Patch(route, handlingFunc)
-			case phttp.DELETE:
+			case http.MethodDelete:
 				router.Delete(route, handlingFunc)
 			default:
-				log.Fatalf("Http method not supported: %q", routeData.Method)
+				log.Fatalf("Http method not supported: %q", routeDefinition.Method)
 			}
 		}
 	}
