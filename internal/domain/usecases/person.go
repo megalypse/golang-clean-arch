@@ -11,7 +11,7 @@ type CreatePerson interface {
 }
 
 type FilterPeople interface {
-	Filter(filters models.Person, baseFilter models.BaseFilter) models.Paginated[models.Person]
+	Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person]
 }
 
 type PersonService interface {
