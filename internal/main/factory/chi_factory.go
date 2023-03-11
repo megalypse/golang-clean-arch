@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	_ "github.com/megalypse/golang-clean-arch/docs"
 )
 
 var router *chi.Mux

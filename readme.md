@@ -7,3 +7,5 @@ Follow the bellow steps to run the software:
 
 1. Create a volume with the command `docker volume create cleanarchdb`
 2. Run `make run-compose`
+
+Check `http://localhost:3001/swagger/index.html` for Swagger Documentation.

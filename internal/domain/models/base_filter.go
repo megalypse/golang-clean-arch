@@ -1,6 +1,7 @@
 package models
 
-type BaseFilter struct {
-	Page  int `json:"page"`
-	Limit int `json:"limit"`
+type BaseFilter[T any] struct {
+	Filters T   `json:"filters"`
+	Page    int `json:"page"`
+	Limit   int `json:"limit"`
 }

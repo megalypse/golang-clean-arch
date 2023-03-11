@@ -14,8 +14,16 @@ DB_IMAGE_ID := ${shell docker images 'cleanarch-db' -a -q}
 clean-db:
 	docker rmi ${DB_IMAGE_ID}
 
-run-compose: build
+
+DOC_DEPS_PATH=./internal/domain/models
+SWAGGER_ENTRYPOINT=./internal/main/factory/router_factory.go
+generate-docs:
+	./swag init -g ${SWAGGER_ENTRYPOINT} --pd --quiet
+
+run-compose: generate-docs build
 	docker compose up -d
 
-run-compose-clean: clean build
+run-compose-clean: generate-docs clean build
 	docker compose up -d
+
+

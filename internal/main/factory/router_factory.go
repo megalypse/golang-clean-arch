@@ -1,9 +1,12 @@
 package factory
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func BootControllers() {
@@ -31,4 +34,15 @@ func BootControllers() {
 			}
 		}
 	}
+
+	bootSwagger(router)
+}
+
+func bootSwagger(router CustomHttpHandler) {
+	rawPort := os.Getenv("SERVER_HOST_PORT")
+	swaggerUrl := fmt.Sprintf("http://localhost:%s/swagger/doc.json", rawPort)
+
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL(swaggerUrl),
+	))
 }

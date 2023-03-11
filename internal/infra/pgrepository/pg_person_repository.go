@@ -56,7 +56,8 @@ func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
 	return &person[0]
 }
 
-func (rep PgPersonRepository) Filter(filters models.Person, baseFilter models.BaseFilter) models.Paginated[models.Person] {
+func (rep PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person] {
+	filters := baseFilter.Filters
 	db := config.GetPgDbConnection()
 	defer db.Close()
 
