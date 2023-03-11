@@ -18,10 +18,15 @@ type UpdatePerson interface {
 	Update(*models.Person) *models.Person
 }
 
+type PersonExists interface {
+	Exists(int64) bool
+}
+
 type PersonService interface {
 	GetPersonById
 	CreatePerson
 	FilterPeople
 	FilterPeople
 	UpdatePerson
+	PersonExists
 }

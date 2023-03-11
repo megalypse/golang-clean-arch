@@ -13,6 +13,17 @@ func WriteJsonResponse(w http.ResponseWriter, payload any) {
 	json.NewEncoder(w).Encode(payload)
 }
 
+func WriteError(w http.ResponseWriter, status int) {
+	err := RequestFailed{
+		ErrorCode: status,
+		Message:   http.StatusText(status),
+	}
+
+	w.WriteHeader(err.ErrorCode)
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(err)
+}
+
 func GetUrlParam(r *http.Request, key string) string {
 	value := chi.URLParam(r, key)
 
@@ -34,4 +45,13 @@ type RouteDefinition struct {
 	Method       string
 	Route        string
 	HandlingFunc http.HandlerFunc
+}
+
+type RequestFailed struct {
+	ErrorCode int    `json:"error_code"`
+	Message   string `json:"message"`
+}
+
+func (rf RequestFailed) Error() string {
+	return rf.Message
 }

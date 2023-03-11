@@ -14,6 +14,19 @@ import (
 // TODO: better connection management per request
 type PgPersonRepository struct{}
 
+func (PgPersonRepository) Exists(id int64) bool {
+	db := config.GetPgDbConnection()
+	defer db.Close()
+
+	var exists bool
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM people WHERE id = $1)", id).Scan(&exists)
+	if err != nil {
+		panic(err)
+	}
+
+	return exists
+}
+
 func (PgPersonRepository) CreatePerson(person models.Person) int64 {
 	db := config.GetPgDbConnection()
 	defer db.Close()
@@ -90,7 +103,6 @@ func (PgPersonRepository) Update(updatedPerson *models.Person) int64 {
 	query += setArg("\nWHERE id = $", argCounter)
 	queryArgs = append(queryArgs, updatedPerson.Id)
 
-	log.Println(query)
 	_, err := db.Query(query, queryArgs...)
 	if err != nil {
 		log.Fatal(err.Error())

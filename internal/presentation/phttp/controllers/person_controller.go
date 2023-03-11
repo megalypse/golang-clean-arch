@@ -14,6 +14,7 @@ type PersonController struct {
 	getPersonByIdUsecase usecases.GetPersonById
 	filterPeopleUsecase  usecases.FilterPeople
 	updatePersonUsecase  usecases.UpdatePerson
+	personExistsUsecase  usecases.PersonExists
 }
 
 func NewPersonController(personService usecases.PersonService) PersonController {
@@ -22,6 +23,7 @@ func NewPersonController(personService usecases.PersonService) PersonController 
 		getPersonByIdUsecase: personService,
 		filterPeopleUsecase:  personService,
 		updatePersonUsecase:  personService,
+		personExistsUsecase:  personService,
 	}
 }
 
@@ -53,12 +55,14 @@ func (pc PersonController) GetHandlers() map[string]phttp.RouteDefinition {
 // @Summary Creates a new person
 // @Tags Person
 // @Success 200 {object} models.Person
+// @Failure 422 {object} phttp.RequestFailed "Unprocessable Entity"
+// @Failure 500 {object} phttp.RequestFailed "Internal Server Error"
 // @Param request body models.Person true "Create person request"
 // @Router /person [post]
 func (pc PersonController) createPerson(w http.ResponseWriter, r *http.Request) {
 	person, err := phttp.ParseBody[models.Person](r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		phttp.WriteError(w, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -75,7 +79,7 @@ func (pc PersonController) filter(w http.ResponseWriter, r *http.Request) {
 	filter, err := phttp.ParseBody[models.BaseFilter[models.Person]](r.Body)
 
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+		phttp.WriteError(w, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -86,13 +90,15 @@ func (pc PersonController) filter(w http.ResponseWriter, r *http.Request) {
 // @Summary Gets a person by id
 // @Tags Person
 // @Success 200 {object} models.Person
+// @Failure 404 {object} phttp.RequestFailed "Person not found"
+// @Failure 500 {object} phttp.RequestFailed "Internal Server Error"
 // @Param personId path int true "Person ID"
 // @Router /person/{personId} [get]
 func (pc PersonController) getPersonById(w http.ResponseWriter, r *http.Request) {
 	personId, err := strconv.ParseInt(phttp.GetUrlParam(r, "personId"), 10, 64)
 
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+		phttp.WriteError(w, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -103,13 +109,23 @@ func (pc PersonController) getPersonById(w http.ResponseWriter, r *http.Request)
 // @Summary Updates a person
 // @Tags Person
 // @Success 200 {object} models.Person
+// @Failure 404 {object} phttp.RequestFailed "Person not found"
+// @Failure 422 {object} phttp.RequestFailed "Unprocessable Entity"
+// @Failure 500 {object} phttp.RequestFailed "Internal Server Error"
 // @Param request body models.Person true "Person model containing updated data"
 // @Router /person [put]
 func (pc PersonController) updatePerson(w http.ResponseWriter, r *http.Request) {
 	updatedPerson, err := phttp.ParseBody[models.Person](r.Body)
 
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+		phttp.WriteError(w, http.StatusUnprocessableEntity)
+		return
+	}
+
+	exists := pc.personExistsUsecase.Exists(*updatedPerson.Id)
+	if !exists {
+		phttp.WriteError(w, http.StatusNotFound)
+		return
 	}
 
 	updatedPerson.DeletedAt = nil

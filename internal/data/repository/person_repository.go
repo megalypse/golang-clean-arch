@@ -7,4 +7,5 @@ type PersonRepository interface {
 	CreatePerson(models.Person) int64
 	Filter(*models.BaseFilter[models.Person]) models.Paginated[models.Person]
 	Update(*models.Person) int64
+	Exists(int64) bool
 }

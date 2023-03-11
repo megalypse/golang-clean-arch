@@ -34,3 +34,7 @@ func (ps PersonService) Update(updatedPerson *models.Person) *models.Person {
 
 	return ps.GetPersonById(id)
 }
+
+func (ps PersonService) Exists(id int64) bool {
+	return ps.personRepository.Exists(id)
+}
