@@ -20,8 +20,8 @@ func WriteError(w http.ResponseWriter, status int) {
 		Message:   http.StatusText(status),
 	}
 
-	w.WriteHeader(err.ErrorCode)
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(err.ErrorCode)
 	json.NewEncoder(w).Encode(err)
 }
 

@@ -16,7 +16,8 @@ type PersonController struct {
 	updatePersonUsecase  usecases.UpdatePerson
 	personExistsUsecase  usecases.PersonExists
 	getAllUsecase        usecases.GetAll
-	deletePersonUsecase  usecases.DeletePerson
+	deletePersonUsecase  usecases.SoftDeletePerson
+	isNotDeletedUsecase  usecases.IsNotDeleted
 }
 
 func NewPersonController(personService usecases.PersonService) PersonController {
@@ -28,6 +29,7 @@ func NewPersonController(personService usecases.PersonService) PersonController 
 		personExistsUsecase:  personService,
 		getAllUsecase:        personService,
 		deletePersonUsecase:  personService,
+		isNotDeletedUsecase:  personService,
 	}
 }
 
@@ -58,15 +60,21 @@ func (pc PersonController) GetHandlers() map[string]phttp.RouteDefinition {
 			Route:        "/person",
 			HandlingFunc: pc.getAllPeople,
 		},
-		"Delete person": {
+		"Soft delete person": {
 			Method:       http.MethodDelete,
 			Route:        "/person/{personId}",
-			HandlingFunc: func(w http.ResponseWriter, r *http.Request) {},
+			HandlingFunc: pc.softDeletePerson,
 		},
 	}
 }
 
-func (pc PersonController) deletePerson(w http.ResponseWriter, r *http.Request) {
+// @Summary Soft deletes a person from the database
+// @Tags Person
+// @Success 204
+// @Failure 500 {object} phttp.RequestFailed "Internal Server Error"
+// @Param personId path int true "Person ID"
+// @Router /person/{personId} [delete]
+func (pc PersonController) softDeletePerson(w http.ResponseWriter, r *http.Request) {
 	personId, err := strconv.ParseInt(phttp.GetUrlParam(r, "personId"), 10, 64)
 	if err != nil {
 		phttp.WriteError(w, http.StatusUnprocessableEntity)
@@ -79,7 +87,7 @@ func (pc PersonController) deletePerson(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	pc.deletePersonUsecase.Delete(personId)
+	pc.deletePersonUsecase.SoftDelete(personId)
 	phttp.WriteJsonResponse(w, "Success", http.StatusNoContent)
 }
 
@@ -144,6 +152,12 @@ func (pc PersonController) getPersonById(w http.ResponseWriter, r *http.Request)
 	}
 
 	person := pc.getPersonByIdUsecase.GetPersonById(personId)
+
+	if person == nil {
+		phttp.WriteError(w, http.StatusNotFound)
+		return
+	}
+
 	phttp.WriteJsonResponse(w, person, http.StatusOK)
 }
 
@@ -157,18 +171,19 @@ func (pc PersonController) getPersonById(w http.ResponseWriter, r *http.Request)
 // @Router /person [put]
 func (pc PersonController) updatePerson(w http.ResponseWriter, r *http.Request) {
 	updatedPerson, err := phttp.ParseBody[models.Person](r.Body)
-
 	if err != nil {
 		phttp.WriteError(w, http.StatusUnprocessableEntity)
 		return
 	}
 
-	exists := pc.personExistsUsecase.Exists(*updatedPerson.Id)
+	exists := pc.isNotDeletedUsecase.IsNotDeleted(*updatedPerson.Id)
 	if !exists {
 		phttp.WriteError(w, http.StatusNotFound)
 		return
 	}
 
+	updatedPerson.CreatedAt = nil
+	updatedPerson.UpdatedAt = nil
 	updatedPerson.DeletedAt = nil
 	person := pc.updatePersonUsecase.Update(updatedPerson)
 	phttp.WriteJsonResponse(w, person, http.StatusOK)

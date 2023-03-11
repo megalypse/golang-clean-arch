@@ -26,11 +26,16 @@ type GetAll interface {
 	GetAll() []models.Person
 }
 
-type DeletePerson interface {
-	Delete(int64)
+type SoftDeletePerson interface {
+	SoftDelete(int64)
+}
+
+type IsNotDeleted interface {
+	IsNotDeleted(int64) bool
 }
 
 type PersonService interface {
+	IsNotDeleted
 	GetPersonById
 	CreatePerson
 	FilterPeople
@@ -38,5 +43,5 @@ type PersonService interface {
 	UpdatePerson
 	PersonExists
 	GetAll
-	DeletePerson
+	SoftDeletePerson
 }

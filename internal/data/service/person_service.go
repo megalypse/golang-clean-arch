@@ -17,16 +17,12 @@ func NewPersonService(personRepository repository.PersonRepository) PersonServic
 	}
 }
 
-func (ps PersonService) Delete(id int64) {
+func (ps PersonService) SoftDelete(id int64) {
 	now := time.Now()
-	targetPerson := models.Person{
-		BaseEntity: models.BaseEntity{
-			Id:        &id,
-			DeletedAt: &now,
-		},
-	}
+	targetPerson := ps.GetPersonById(id)
+	targetPerson.DeletedAt = &now
 
-	ps.personRepository.Update(&targetPerson)
+	ps.personRepository.Update(targetPerson)
 }
 
 func (ps PersonService) GetAll() []models.Person {
@@ -55,4 +51,8 @@ func (ps PersonService) Update(updatedPerson *models.Person) *models.Person {
 
 func (ps PersonService) Exists(id int64) bool {
 	return ps.personRepository.Exists(id)
+}
+
+func (ps PersonService) IsNotDeleted(id int64) bool {
+	return ps.personRepository.IsNotDeleted(id)
 }
