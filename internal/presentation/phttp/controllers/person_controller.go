@@ -15,6 +15,7 @@ type PersonController struct {
 	filterPeopleUsecase  usecases.FilterPeople
 	updatePersonUsecase  usecases.UpdatePerson
 	personExistsUsecase  usecases.PersonExists
+	getAllUsecase        usecases.GetAll
 }
 
 func NewPersonController(personService usecases.PersonService) PersonController {
@@ -24,6 +25,7 @@ func NewPersonController(personService usecases.PersonService) PersonController 
 		filterPeopleUsecase:  personService,
 		updatePersonUsecase:  personService,
 		personExistsUsecase:  personService,
+		getAllUsecase:        personService,
 	}
 }
 
@@ -49,7 +51,22 @@ func (pc PersonController) GetHandlers() map[string]phttp.RouteDefinition {
 			Route:        "/person",
 			HandlingFunc: pc.updatePerson,
 		},
+		"Get all people": {
+			Method:       http.MethodGet,
+			Route:        "/person",
+			HandlingFunc: pc.getAllPeople,
+		},
 	}
+}
+
+// @Summary Gets all people from database
+// @Tags Person
+// @Success 200 {array} models.Person
+// @Failure 500 {object} phttp.RequestFailed "Internal Server Error"
+// @Router /person [get]
+func (pc PersonController) getAllPeople(w http.ResponseWriter, r *http.Request) {
+	people := pc.getAllUsecase.GetAll()
+	phttp.WriteJsonResponse(w, people)
 }
 
 // @Summary Creates a new person

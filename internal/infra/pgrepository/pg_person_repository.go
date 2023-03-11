@@ -14,6 +14,22 @@ import (
 // TODO: better connection management per request
 type PgPersonRepository struct{}
 
+func (PgPersonRepository) GetAll() []models.Person {
+	db := config.GetPgDbConnection()
+	defer db.Close()
+
+	sttmt := `
+	SELECT * FROM people
+	`
+
+	row, err := db.Query(sttmt)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	person, _ := getPeopleFromRows(row)
+	return person
+}
+
 func (PgPersonRepository) Exists(id int64) bool {
 	db := config.GetPgDbConnection()
 	defer db.Close()
