@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/megalypse/golang-clean-arch/internal/data/repository"
 	"github.com/megalypse/golang-clean-arch/internal/domain/models"
 )
@@ -13,6 +15,18 @@ func NewPersonService(personRepository repository.PersonRepository) PersonServic
 	return PersonService{
 		personRepository: personRepository,
 	}
+}
+
+func (ps PersonService) Delete(id int64) {
+	now := time.Now()
+	targetPerson := models.Person{
+		BaseEntity: models.BaseEntity{
+			Id:        &id,
+			DeletedAt: &now,
+		},
+	}
+
+	ps.personRepository.Update(&targetPerson)
 }
 
 func (ps PersonService) GetAll() []models.Person {

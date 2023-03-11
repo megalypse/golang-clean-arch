@@ -8,8 +8,9 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func WriteJsonResponse(w http.ResponseWriter, payload any) {
+func WriteJsonResponse(w http.ResponseWriter, payload any, statusCode int) {
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(payload)
 }
 
@@ -24,8 +25,8 @@ func WriteError(w http.ResponseWriter, status int) {
 	json.NewEncoder(w).Encode(err)
 }
 
-func GetUrlParam(r *http.Request, key string) string {
-	value := chi.URLParam(r, key)
+func GetUrlParam(r *http.Request, paramName string) string {
+	value := chi.URLParam(r, paramName)
 
 	return value
 }

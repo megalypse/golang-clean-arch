@@ -26,6 +26,10 @@ type GetAll interface {
 	GetAll() []models.Person
 }
 
+type DeletePerson interface {
+	Delete(int64)
+}
+
 type PersonService interface {
 	GetPersonById
 	CreatePerson
@@ -34,4 +38,5 @@ type PersonService interface {
 	UpdatePerson
 	PersonExists
 	GetAll
+	DeletePerson
 }
