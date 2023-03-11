@@ -19,7 +19,8 @@ func (PgPersonRepository) GetAll() []models.Person {
 	defer db.Close()
 
 	sttmt := `
-	SELECT * FROM people
+	SELECT * FROM people p
+	WHERE p.id IS NULL
 	`
 
 	row, err := db.Query(sttmt)
@@ -36,6 +37,19 @@ func (PgPersonRepository) Exists(id int64) bool {
 
 	var exists bool
 	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM people WHERE id = $1)", id).Scan(&exists)
+	if err != nil {
+		panic(err)
+	}
+
+	return exists
+}
+
+func (PgPersonRepository) IsNotDeleted(id int64) bool {
+	db := config.GetPgDbConnection()
+	defer db.Close()
+
+	var exists bool
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM people WHERE id = $1 AND deleted_at IS NULL)", id).Scan(&exists)
 	if err != nil {
 		panic(err)
 	}
@@ -75,14 +89,20 @@ func (PgPersonRepository) GetPersonById(id int64) *models.Person {
 	sttmt := `
 	SELECT * FROM people p
 	WHERE p.id = $1
+		AND p.deleted_at IS NULL;
 	`
 
 	row, err := db.Query(sttmt, id)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	person, _ := getPeopleFromRows(row)
-	return &person[0]
+	people, _ := getPeopleFromRows(row)
+
+	if len(people) > 0 {
+		return &people[0]
+	}
+
+	return nil
 }
 
 func (PgPersonRepository) Update(updatedPerson *models.Person) int64 {
@@ -119,6 +139,7 @@ func (PgPersonRepository) Update(updatedPerson *models.Person) int64 {
 	query += setArg("\nWHERE id = $", argCounter)
 	queryArgs = append(queryArgs, updatedPerson.Id)
 
+	log.Println("query: " + query)
 	_, err := db.Query(query, queryArgs...)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -127,6 +148,10 @@ func (PgPersonRepository) Update(updatedPerson *models.Person) int64 {
 	return *updatedPerson.Id
 }
 
+// TODO: Implement more flexible filtering for dates
+/*
+Filter filters people based on the fields != nil inside baseFilter
+*/
 func (PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person] {
 	filters := baseFilter.Filters
 	db := config.GetPgDbConnection()
@@ -182,12 +207,7 @@ func (PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person]) m
 		queryArgs = append(queryArgs, filters.UpdatedAt)
 	}
 
-	if filters.DeletedAt != nil {
-		argCounter++
-
-		query += setArg("\nAND p.deleted_at = $", argCounter)
-		queryArgs = append(queryArgs, filters.DeletedAt)
-	}
+	query += "\nAND p.deleted_at IS NULL"
 
 	limit := 20
 	if baseFilter.Limit != 0 {

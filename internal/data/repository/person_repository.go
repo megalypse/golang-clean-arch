@@ -9,4 +9,5 @@ type PersonRepository interface {
 	Update(*models.Person) int64
 	Exists(int64) bool
 	GetAll() []models.Person
+	IsNotDeleted(int64) bool
 }
