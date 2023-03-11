@@ -15,11 +15,10 @@ clean-db:
 	docker rmi ${DB_IMAGE_ID}
 
 
-DOC_REGISTRY_PATH=./internal/presentation/phttp/controllers/controller_doc_registry.go
 DOC_DEPS_PATH=./internal/domain/models
-OTHER_PATH=./internal/main/factory/router_factory.go
+SWAGGER_ENTRYPOINT=./internal/main/factory/router_factory.go
 generate-docs:
-	./swag init -g ${OTHER_PATH} --pd ${DOC_DEPS_PATH}
+	./swag init -g ${SWAGGER_ENTRYPOINT} --pd --quiet
 
 run-compose: generate-docs build
 	docker compose up -d
