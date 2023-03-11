@@ -22,6 +22,10 @@ type PersonExists interface {
 	Exists(int64) bool
 }
 
+type GetAll interface {
+	GetAll() []models.Person
+}
+
 type PersonService interface {
 	GetPersonById
 	CreatePerson
@@ -29,4 +33,5 @@ type PersonService interface {
 	FilterPeople
 	UpdatePerson
 	PersonExists
+	GetAll
 }

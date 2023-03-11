@@ -8,4 +8,5 @@ type PersonRepository interface {
 	Filter(*models.BaseFilter[models.Person]) models.Paginated[models.Person]
 	Update(*models.Person) int64
 	Exists(int64) bool
+	GetAll() []models.Person
 }

@@ -15,6 +15,10 @@ func NewPersonService(personRepository repository.PersonRepository) PersonServic
 	}
 }
 
+func (ps PersonService) GetAll() []models.Person {
+	return ps.personRepository.GetAll()
+}
+
 func (ps PersonService) GetPersonById(id int64) *models.Person {
 	return ps.personRepository.GetPersonById(id)
 }
