@@ -14,7 +14,20 @@ import (
 // TODO: better connection management per request
 type PgPersonRepository struct{}
 
-func (rep PgPersonRepository) CreatePerson(person models.Person) int {
+func (PgPersonRepository) Exists(id int64) bool {
+	db := config.GetPgDbConnection()
+	defer db.Close()
+
+	var exists bool
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM people WHERE id = $1)", id).Scan(&exists)
+	if err != nil {
+		panic(err)
+	}
+
+	return exists
+}
+
+func (PgPersonRepository) CreatePerson(person models.Person) int64 {
 	db := config.GetPgDbConnection()
 	defer db.Close()
 
@@ -28,7 +41,7 @@ func (rep PgPersonRepository) CreatePerson(person models.Person) int {
 		LastInsertId() is not supported by lib/pq, so this needs to be manually done to get
 		the new row ID.
 	*/
-	var newRowId int
+	var newRowId int64
 	err := db.QueryRow(
 		sttmt, person.Fullname, person.Age, person.Email, time.Now(), nil, nil,
 	).Scan(&newRowId)
@@ -39,7 +52,7 @@ func (rep PgPersonRepository) CreatePerson(person models.Person) int {
 	return newRowId
 }
 
-func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
+func (PgPersonRepository) GetPersonById(id int64) *models.Person {
 	db := config.GetPgDbConnection()
 	defer db.Close()
 
@@ -56,7 +69,49 @@ func (rep PgPersonRepository) GetPersonById(id int) *models.Person {
 	return &person[0]
 }
 
-func (rep PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person] {
+func (PgPersonRepository) Update(updatedPerson *models.Person) int64 {
+	db := config.GetPgDbConnection()
+	defer db.Close()
+
+	now := time.Now()
+
+	query := `
+	UPDATE people
+	SET fullname = $1,
+	age = $2,
+	email = $3
+	`
+
+	argCounter := 3
+	queryArgs := []any{
+		updatedPerson.Fullname,
+		updatedPerson.Age,
+		updatedPerson.Email,
+	}
+
+	if updatedPerson.DeletedAt != nil {
+		argCounter++
+		query += setArg(",\ndeleted_at = $", argCounter)
+		queryArgs = append(queryArgs, now)
+	}
+
+	argCounter++
+	query += setArg(",\nupdated_at = $", argCounter)
+	queryArgs = append(queryArgs, now)
+
+	argCounter++
+	query += setArg("\nWHERE id = $", argCounter)
+	queryArgs = append(queryArgs, updatedPerson.Id)
+
+	_, err := db.Query(query, queryArgs...)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return *updatedPerson.Id
+}
+
+func (PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person] {
 	filters := baseFilter.Filters
 	db := config.GetPgDbConnection()
 	defer db.Close()
@@ -69,28 +124,28 @@ func (rep PgPersonRepository) Filter(baseFilter *models.BaseFilter[models.Person
 	queryArgs := []any{}
 	var argCounter int
 
-	if filters.Id != 0 {
+	if filters.Id != nil && *filters.Id != 0 {
 		argCounter++
 
 		query += setArg("\nAND p.id = $", argCounter)
 		queryArgs = append(queryArgs, filters.Id)
 	}
 
-	if filters.Fullname != "" {
+	if filters.Fullname != nil && *filters.Fullname != "" {
 		argCounter++
 
 		query += setArg("\nAND p.fullname ILIKE $", argCounter)
-		queryArgs = append(queryArgs, "%"+filters.Fullname+"%")
+		queryArgs = append(queryArgs, "%"+(*filters.Fullname)+"%")
 	}
 
-	if filters.Age != 0 {
+	if filters.Age != nil && *filters.Age != 0 {
 		argCounter++
 
 		query += setArg("\nAND p.age = $", argCounter)
 		queryArgs = append(queryArgs, filters.Age)
 	}
 
-	if filters.Email != "" {
+	if filters.Email != nil && *filters.Email != "" {
 		argCounter++
 
 		query += setArg("\nAND p.email = $", 4)

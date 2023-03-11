@@ -15,7 +15,7 @@ func NewPersonService(personRepository repository.PersonRepository) PersonServic
 	}
 }
 
-func (ps PersonService) GetPersonById(id int) *models.Person {
+func (ps PersonService) GetPersonById(id int64) *models.Person {
 	return ps.personRepository.GetPersonById(id)
 }
 
@@ -27,4 +27,14 @@ func (ps PersonService) CreatePerson(person models.Person) *models.Person {
 
 func (ps PersonService) Filter(baseFilter *models.BaseFilter[models.Person]) models.Paginated[models.Person] {
 	return ps.personRepository.Filter(baseFilter)
+}
+
+func (ps PersonService) Update(updatedPerson *models.Person) *models.Person {
+	id := ps.personRepository.Update(updatedPerson)
+
+	return ps.GetPersonById(id)
+}
+
+func (ps PersonService) Exists(id int64) bool {
+	return ps.personRepository.Exists(id)
 }
