@@ -9,14 +9,20 @@ import (
 
 var personRepository repository.PersonRepository
 var personService service.PersonService
+var personController controllers.PersonController
 
 func init() {
 	personRepository = pgrepository.PgPersonRepository{}
 	personService = service.NewPersonService(personRepository)
+	personController = controllers.NewPersonController(personService)
 }
 
 func GetControllers() []controllers.Controller {
 	return []controllers.Controller{
-		controllers.NewPersonController(personService),
+		personController,
 	}
+}
+
+func GetPersonController() controllers.PersonController {
+	return personController
 }

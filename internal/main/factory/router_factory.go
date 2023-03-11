@@ -1,34 +1,28 @@
 package factory
 
-import (
-	"log"
-
-	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
-)
-
 func BootControllers() {
-	router := GetRouter()
+	// router := GetRouter()
 
-	controllers := GetControllers()
+	// controllers := GetControllers()
 
-	for _, controller := range controllers {
-		for route, routeData := range controller.GetHandlers() {
-			handlingFunc := routeData.HandlingFunc
+	// for _, controller := range controllers {
+	// 	for route, routeData := range controller.GetHandlers() {
+	// 		handlingFunc := routeData.HandlingFunc
 
-			switch routeData.Method {
-			case phttp.GET:
-				router.Get(route, handlingFunc)
-			case phttp.POST:
-				router.Post(route, handlingFunc)
-			case phttp.PUT:
-				router.Put(route, handlingFunc)
-			case phttp.PATCH:
-				router.Patch(route, handlingFunc)
-			case phttp.DELETE:
-				router.Delete(route, handlingFunc)
-			default:
-				log.Fatalf("Http method not supported: %q", routeData.Method)
-			}
-		}
-	}
+	// 		switch routeData.Method {
+	// 		case phttp.GET:
+	// 			router.Get(route, handlingFunc)
+	// 		case phttp.POST:
+	// 			router.Post(route, handlingFunc)
+	// 		case phttp.PUT:
+	// 			router.Put(route, handlingFunc)
+	// 		case phttp.PATCH:
+	// 			router.Patch(route, handlingFunc)
+	// 		case phttp.DELETE:
+	// 			router.Delete(route, handlingFunc)
+	// 		default:
+	// 			log.Fatalf("Http method not supported: %q", routeData.Method)
+	// 		}
+	// 	}
+	// }
 }

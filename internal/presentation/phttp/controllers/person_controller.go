@@ -9,21 +9,21 @@ import (
 	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
 )
 
-type personController struct {
+type PersonController struct {
 	createPersonUseCase  usecases.CreatePerson
 	getPersonByIdUseCase usecases.GetPersonById
 	filterPeopleUsecase  usecases.FilterPeople
 }
 
-func NewPersonController(personService usecases.PersonService) personController {
-	return personController{
+func NewPersonController(personService usecases.PersonService) PersonController {
+	return PersonController{
 		createPersonUseCase:  personService,
 		getPersonByIdUseCase: personService,
 		filterPeopleUsecase:  personService,
 	}
 }
 
-func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
+func (pc PersonController) GetHandlers() map[string]phttp.RouteDefinition {
 	return map[string]phttp.RouteDefinition{
 		"/person": {
 			Method:       phttp.POST,
@@ -40,7 +40,10 @@ func (pc personController) GetHandlers() map[string]phttp.RouteDefinition {
 	}
 }
 
-func (pc personController) createPerson(w http.ResponseWriter, r *http.Request) {
+// @Summary Creates a new person
+// @Success 200 {object} models.Person
+// @Router /person [post]
+func (pc PersonController) createPerson(w http.ResponseWriter, r *http.Request) {
 	person, err := phttp.ParseBody[models.Person](r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -51,7 +54,10 @@ func (pc personController) createPerson(w http.ResponseWriter, r *http.Request) 
 	phttp.WriteJsonResponse(w, createdPerson)
 }
 
-func (pc personController) filter(w http.ResponseWriter, r *http.Request) {
+// @Summary Filter person
+// @Success 200 {object} models.Paginated[models.Person]
+// @Router /person/filter [post]
+func (pc PersonController) filter(w http.ResponseWriter, r *http.Request) {
 	person, err := phttp.ParseBody[struct {
 		models.Person
 		models.BaseFilter
@@ -66,7 +72,11 @@ func (pc personController) filter(w http.ResponseWriter, r *http.Request) {
 	phttp.WriteJsonResponse(w, result)
 }
 
-func (pc personController) getPersonById(w http.ResponseWriter, r *http.Request) {
+// @Summary Gets a person by id
+// @Success 200 {object} models.Person
+// @Param id path int true "Person ID"
+// @Router /person/{personId} [get]
+func (pc PersonController) getPersonById(w http.ResponseWriter, r *http.Request) {
 	personId, err := strconv.Atoi(phttp.GetUrlParam(r, "personId"))
 
 	if err != nil {

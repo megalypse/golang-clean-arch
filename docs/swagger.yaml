@@ -1,0 +1,67 @@
+definitions:
+  ? github_com_megalypse_golang-clean-arch_internal_domain_models.Paginated-github_com_megalypse_golang-clean-arch_internal_domain_models_Person
+  : properties:
+      content:
+        items:
+          $ref: '#/definitions/github_com_megalypse_golang-clean-arch_internal_domain_models.Person'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_megalypse_golang-clean-arch_internal_domain_models.Person:
+    properties:
+      age:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /person:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_megalypse_golang-clean-arch_internal_domain_models.Person'
+      summary: Creates a new person
+  /person/{personId}:
+    get:
+      parameters:
+      - description: Person ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_megalypse_golang-clean-arch_internal_domain_models.Person'
+      summary: Gets a person by id
+  /person/filter:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_megalypse_golang-clean-arch_internal_domain_models.Paginated-github_com_megalypse_golang-clean-arch_internal_domain_models_Person'
+      summary: Filter person
+swagger: "2.0"
