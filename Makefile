@@ -9,7 +9,7 @@ clean:
 DOC_DEPS_PATH=./internal/domain/models
 SWAGGER_ENTRYPOINT=./internal/main/factory/router_factory.go
 generate-docs:
-	./swag init -g ${SWAGGER_ENTRYPOINT} --pd --quiet
+	swag init -g ${SWAGGER_ENTRYPOINT} --pd --quiet
 
 run-compose: generate-docs build
 	docker compose up -d
