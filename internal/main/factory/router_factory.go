@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/megalypse/golang-clean-arch/docs"
 	"github.com/megalypse/golang-clean-arch/internal/presentation/phttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
