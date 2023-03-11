@@ -41,6 +41,7 @@ func (pc PersonController) GetHandlers() map[string]phttp.RouteDefinition {
 }
 
 // @Summary Creates a new person
+// @Tags Person
 // @Success 200 {object} models.Person
 // @Router /person [post]
 func (pc PersonController) createPerson(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +56,7 @@ func (pc PersonController) createPerson(w http.ResponseWriter, r *http.Request) 
 }
 
 // @Summary Filter person
+// @Tags Person
 // @Success 200 {object} models.Paginated[models.Person]
 // @Router /person/filter [post]
 func (pc PersonController) filter(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +75,7 @@ func (pc PersonController) filter(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Summary Gets a person by id
+// @Tags Person
 // @Success 200 {object} models.Person
 // @Param id path int true "Person ID"
 // @Router /person/{personId} [get]
